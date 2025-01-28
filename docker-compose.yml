@@ -1,0 +1,61 @@
+services:
+  mqtt_broker:
+    image: mqtt:eclipse-mosquitto
+    container_name: mqtt_broker
+    restart: always
+    hostname: broker
+    networks:
+       net-172.3.0.0:
+          ipv4_address: 172.3.0.11
+    ports:
+      - "1883:1883"  # Port MQTT
+      - "9001:9001"  # Port WebSocket (optionnel)
+    volumes:
+      - ./captures:/captures  # Pour récupérer le fichier pcap après la capture
+
+  mqtt_subscriber:
+    #image: emqx/mqttx-web
+    image: mqtt:mqttx-web
+    hostname: ubscriber
+    container_name: mqtt_subscriber
+    networks:
+       net-172.3.0.0:
+          ipv4_address: 172.3.0.12
+    depends_on:
+      - mqtt_broker
+
+  mqtt_publisher:
+    image: mqtt:python
+    container_name: mqtt_publisher
+    hostname: publisher
+    networks:
+       net-172.3.0.0:
+          ipv4_address: 172.3.0.13
+    depends_on:
+      - mqtt_broker
+
+  mqtt_sacpy:
+    #image: handsonsecurity/seed-ubuntu:large
+    image: mqtt:scapy
+    container_name: mqtt_scapy
+    hostname: sacpy
+    tty: true
+    privileged: true
+    networks:
+        net-172.3.0.0:
+            ipv4_address: 172.3.0.14
+    volumes:
+      - ./captures:/captures  # Pour récupérer le fichier pcap après la capture
+    cap_add:
+      - ALL
+    depends_on:
+      - mqtt_broker
+
+networks:
+    net-172.3.0.0:
+        driver: bridge
+        name: net-172.3.0.0
+        ipam:
+            config:
+                - subnet: 172.3.0.0/24
+

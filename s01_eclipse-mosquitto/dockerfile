@@ -1,0 +1,30 @@
+FROM debian:stable-slim
+
+ENV LANG=fr_FR.UTF-8 
+
+RUN apt-get update -y && apt-get upgrade -y 
+RUN apt install -y \
+    mosquitto \
+    mosquitto-clients \
+    tcpdump 
+
+# Copier la configuration Mosquitto
+COPY mosquitto.conf /mosquitto/config/mosquitto.conf
+
+# Créer un dossier pour les captures tcpdump
+RUN mkdir -p /captures
+
+# Copier le script de démarrage
+COPY run-tcpdump_mosquitto.sh /run-tcpdump_mosquitto.sh
+
+# Rendre le script exécutable
+RUN chmod +x /run-tcpdump_mosquitto.sh
+
+# # Exposer le port 1883 pour MQTT
+EXPOSE 1883
+
+#CMD ["/usr/sbin/mosquitto", "-c", "/mosquitto/config/mosquitto.conf"]
+
+# Utiliser le script comme point d'entrée
+ENTRYPOINT ["/run-tcpdump_mosquitto.sh"]
+

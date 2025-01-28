@@ -1,0 +1,14 @@
+# Dockerfile pour le Publisher (simulateur de mesures)
+FROM python:3.9-slim
+
+
+# Installer le client MQTT Paho
+RUN pip install paho-mqtt
+
+# Copier le script Python qui simule les mesures
+COPY publisher.py /app/publisher.py
+
+WORKDIR /app
+
+# Lancer le script Python
+CMD ["python", "publisher.py"]
