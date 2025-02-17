@@ -74,6 +74,5 @@ Ce projet permet de :
 
 ## Auteurs
 
-- Prénom Nom
-- Collaborateur 2
+- David BAGOT
 
